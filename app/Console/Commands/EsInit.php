@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Vinhson\Elasticsearch\Facades\ElasticsearchClient;
 use Vinhson\Elasticsearch\Facades\SearchBuilder;
 
@@ -46,7 +47,11 @@ class EsInit extends Command
         if (!ElasticsearchClient::indices()->exists($aliasName)) {
             $this->info("索引不存在，准备创建");
             $this->createIndex();
-            $this->info("创建成功");
+            $this->info("创建成功，准备初始化数据");
+            Artisan::call("es:import", [
+                "index" => $currentAlias
+            ]);
+            $this->info("操作成功");
         } else {
             $this->info("索引已存在，准备删除");
             ElasticsearchClient::indices()->delete($aliasName);

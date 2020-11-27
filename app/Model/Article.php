@@ -16,7 +16,7 @@ class Article extends Model
 
         $arrtibute["label"] = Label::whereIn("id", $this->label_id)->pluck("title")->implode("，");
 
-        $arrtibute["content"] = strip_tags($arrtibute["content"]);
+        $arrtibute["content"] = str_replace(["\r\n", "&nbsp", ";"], "", strip_tags($arrtibute["content"]));
 
         return $arrtibute;
     }

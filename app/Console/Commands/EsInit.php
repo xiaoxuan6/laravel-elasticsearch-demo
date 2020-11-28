@@ -46,26 +46,34 @@ class EsInit extends Command
         $this->info('正在处理索引 ' . $currentAlias);
         if (!ElasticsearchClient::indices()->exists($aliasName)) {
             $this->info("索引不存在，准备创建");
-            $this->createIndex();
+            $this->createIndex($currentAlias);
             $this->info("创建成功，准备初始化数据");
             Artisan::call("es:import", [
                 "index" => $currentAlias
             ]);
             $this->info("操作成功");
-        } else {
-            $this->info("索引已存在，准备删除");
-            ElasticsearchClient::indices()->delete($aliasName);
-            $this->info("删除成功");
+            die;
         }
+
+        try {
+            $this->info('索引存在，准备更新');
+            $this->updateIndex($aliasName);
+        } catch (\Exception $exception) {
+            $this->warn('更新失败，准备删除');
+            $this->delete($aliasName);
+        }
+
+        $this->info($currentAlias . ' 操作成功');
 
     }
 
-    public function createIndex()
+    public function createIndex($aliasName)
     {
-        $params = SearchBuilder::putSettings([
-            "number_of_shards"   => 1,
-            "number_of_replicas" => 0
-        ])
+        $params = SearchBuilder::setIndex($aliasName . "_1000")
+            ->putSettings([
+                "number_of_shards"   => 1,
+                "number_of_replicas" => 0
+            ])
             ->putMapping([
                 "properties" => [
                     "name"    => [
@@ -83,7 +91,8 @@ class EsInit extends Command
                     ]
                 ]
             ])
-            ->unsetType()
+            ->setAttribute(["body.aliases" => [$aliasName => new \stdClass()]])
+            ->unsetType()// 版本7之后不再支持type
             ->builder();
 
         try {
@@ -91,5 +100,51 @@ class EsInit extends Command
         } catch (\Exception $exception) {
             $this->error("{$exception->getMessage()}");
         }
+    }
+
+    /**
+     * Notes: 修改索引
+     * Warning：这里不能直接修改原来的字段类型，也不能缺少字段，只能添加新字段
+     * Date: 2020/11/28 11:38
+     */
+    public function updateIndex($aliasName)
+    {
+        ElasticsearchClient::indices()->close($aliasName);
+
+        $params = SearchBuilder::putMapping([
+            "properties" => [
+                "name"    => [
+                    "type"            => "text",
+                    "analyzer"        => "ik_max_word",
+                    "search_analyzer" => "ik_max_word"
+                ],
+                "content" => [
+                    "type"            => "text",
+                    "analyzer"        => "ik_max_word",
+                    "search_analyzer" => "ik_max_word"
+                ],
+                "label"   => [
+                    "type" => "keyword",
+                ]
+            ]
+        ], true)
+            ->unsetType()
+//            ->setAttribute(["include_type_name" => true]) // 版本7之后不支持type 如何使用设置该值
+            ->builder();
+
+        ElasticsearchClient::indices()->putMapping($params);
+
+        ElasticsearchClient::indices()->open($aliasName);
+    }
+
+    public function delete($aliasName)
+    {
+        // 获取索引别名（创建是指定了别名）
+        $aliasName = ElasticsearchClient::indices()->getAliases($aliasName);
+
+        // 获取第一个索引名
+        $indexName = current(array_keys($aliasName));
+
+        ElasticsearchClient::indices()->delete(["index" => $indexName]);
     }
 }

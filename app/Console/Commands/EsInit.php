@@ -70,27 +70,8 @@ class EsInit extends Command
     public function createIndex($aliasName)
     {
         $params = SearchBuilder::setIndex($aliasName . "_1000")
-            ->putSettings([
-                "number_of_shards"   => 1,
-                "number_of_replicas" => 0
-            ])
-            ->putMapping([
-                "properties" => [
-                    "name"    => [
-                        "type"            => "text",
-                        "analyzer"        => "ik_max_word",
-                        "search_analyzer" => "ik_max_word"
-                    ],
-                    "content" => [
-                        "type"            => "text",
-                        "analyzer"        => "ik_max_word",
-                        "search_analyzer" => "ik_max_word"
-                    ],
-                    "label"   => [
-                        "type" => "keyword",
-                    ]
-                ]
-            ])
+            ->putSettings(Indices::getSettings())
+            ->putMapping(Indices::getProperties())
             ->setAliases([$aliasName => new \stdClass()])
 //            ->setAttribute(["body.aliases" => [$aliasName => new \stdClass()]])
             ->unsetType()// 版本7之后不再支持type
@@ -112,23 +93,7 @@ class EsInit extends Command
     {
         ElasticsearchClient::indices()->close($aliasName);
 
-        $params = SearchBuilder::putMapping([
-            "properties" => [
-                "name"    => [
-                    "type"            => "text",
-                    "analyzer"        => "ik_max_word",
-                    "search_analyzer" => "ik_max_word"
-                ],
-                "content" => [
-                    "type"            => "text",
-                    "analyzer"        => "ik_max_word",
-                    "search_analyzer" => "ik_max_word"
-                ],
-                "label"   => [
-                    "type" => "keyword",
-                ]
-            ]
-        ], true)
+        $params = SearchBuilder::putMapping(Indices::getProperties(), true)
             ->unsetType()
 //            ->setAttribute(["include_type_name" => true]) // 版本7之后不支持type 如何使用设置该值
             ->builder();

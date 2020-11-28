@@ -37,7 +37,8 @@ class Indices
                     "type" => "keyword",
                 ],
                 "created_at" => [
-                    "type" => "date"
+                    "type" => "date",
+                    "format" => "yyyy-MM-dd HH:mm:ss" // 主要这里不指定日期格式会报错，不支持这个日期类型，默认:"strict_date_optional_time||epoch_millis"
                 ],
                 "view" => [
                     "type" => "integer"

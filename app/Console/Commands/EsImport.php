@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Model\Article;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Vinhson\Elasticsearch\Facades\ElasticsearchClient;
 
 class EsImport extends Command
@@ -55,7 +56,7 @@ class EsImport extends Command
                         ]
                     ];
 
-                    $params["body"][] = $data;
+                    $params["body"][] = Arr::only($data, ["id", "name", "content", "view", "label", "created_at"]);
                 }
 
                 try{

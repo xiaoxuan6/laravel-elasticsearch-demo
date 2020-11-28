@@ -91,7 +91,8 @@ class EsInit extends Command
                     ]
                 ]
             ])
-            ->setAttribute(["body.aliases" => [$aliasName => new \stdClass()]])
+            ->setAliases([$aliasName => new \stdClass()])
+//            ->setAttribute(["body.aliases" => [$aliasName => new \stdClass()]])
             ->unsetType()// 版本7之后不再支持type
             ->builder();
 

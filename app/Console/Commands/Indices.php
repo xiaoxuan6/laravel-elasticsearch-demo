@@ -38,7 +38,11 @@ class Indices
                 ],
                 "created_at" => [
                     "type" => "date",
-                    "format" => "yyyy-MM-dd HH:mm:ss" // 主要这里不指定日期格式会报错，不支持这个日期类型，默认:"strict_date_optional_time||epoch_millis"
+                    "format" => "yyyy-MM-dd HH:mm:ss"
+                    // 主要这里不指定日期格式会报错，不支持这个日期类型，默认:"strict_date_optional_time||epoch_millis"
+                    /**
+                     * @see https://segmentfault.com/a/1190000016296983
+                     */
                 ],
                 "view" => [
                     "type" => "integer"

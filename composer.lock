@@ -566,16 +566,16 @@
         },
         {
             "name": "james.xue/laravel-elasticsearch",
-            "version": "2.0.2",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/xiaoxuan6/laravel-elasticsearch.git",
-                "reference": "65153282e5f9e86e1f5a773df71453b65487306e"
+                "reference": "89e558669815611543f60755e5e8ffcfe49d0e05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/xiaoxuan6/laravel-elasticsearch/zipball/65153282e5f9e86e1f5a773df71453b65487306e",
-                "reference": "65153282e5f9e86e1f5a773df71453b65487306e",
+                "url": "https://api.github.com/repos/xiaoxuan6/laravel-elasticsearch/zipball/89e558669815611543f60755e5e8ffcfe49d0e05",
+                "reference": "89e558669815611543f60755e5e8ffcfe49d0e05",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -624,7 +624,7 @@
                 "laravel",
                 "search"
             ],
-            "time": "2020-11-28T04:51:46+00:00"
+            "time": "2020-11-28T11:18:08+00:00"
         },
         {
             "name": "laravel/framework",

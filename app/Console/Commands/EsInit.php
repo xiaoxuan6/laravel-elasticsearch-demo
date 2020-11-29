@@ -87,7 +87,8 @@ class EsInit extends Command
     /**
      * Notes: 修改索引
      * Warning：这里不能直接修改原来的字段类型，也不能缺少字段，只能添加新字段
-     * Date: 2020/11/28 11:38
+     *          @see https://blog.csdn.net/tclzsn7456/article/details/79957913
+     *          @see https://blog.csdn.net/lln_avaj/article/details/85048633
      */
     public function updateIndex($aliasName)
     {

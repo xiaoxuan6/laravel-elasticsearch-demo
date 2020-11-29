@@ -47,5 +47,5 @@ return [
     /**
      * Elasticsearch 版本 7.0 之后不支持 type ，需要初始化删掉 type 属性
      */
-    "is_unset_type" => false,
+    "is_unset_type" => true,
 ];

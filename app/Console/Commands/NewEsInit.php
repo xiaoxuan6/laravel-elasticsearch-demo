@@ -13,7 +13,7 @@ class NewEsInit extends Command
      *
      * @var string
      */
-    protected $signature = 'es:new-init';
+    protected $signature = 'es:new-init {--online}';
 
     /**
      * The console command description.
@@ -32,9 +32,6 @@ class NewEsInit extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->index = "demo_index_1000";
-        $this->newIndex = "demo_index_20201129";
-        $this->aliasIndex = "alias_demo_index_20201129";
     }
 
     /**
@@ -44,6 +41,16 @@ class NewEsInit extends Command
      */
     public function handle()
     {
+        if($this->option("online")) {
+            $this->index = "demo_index_20201129";
+            $this->newIndex = "demo_index_1000";
+            $this->aliasIndex = "alias_demo_index_1000";
+        } else {
+            $this->index = "demo_index_1000";
+            $this->newIndex = "demo_index_20201129";
+            $this->aliasIndex = "alias_demo_index_20201129";
+        }
+
         if (ElasticsearchClient::indices()->exists(["index" => $this->newIndex])) {
             $this->info("索引 {$this->newIndex} 已存在，准备删除");
             $this->delete();
@@ -111,16 +118,18 @@ class NewEsInit extends Command
     {
         $params = [
             "body" => [
+                "max_docs" => "20", // 最大同步文档数据
                 "source" => [
                     "index"   => $this->index,
                     // 搜索条件、对满足query条件的数据进行reindex操作
-                    "query"   => [
-                        "match" => [
-                            "name" => "模型dingo"
-                        ]
-                    ],
+//                    "query"   => [
+//                        "match" => [
+//                            "name" => "模型dingo"
+//                        ],
+//                        "size" => 100, //满足条件的100条
+//                    ],
                     // 数据迁移，保留的字段
-                    "_source" => ["id", "name", "content"]
+//                    "_source" => ["id", "name", "content"]
 
                     /**
                      * 更多使用方法：
@@ -129,6 +138,12 @@ class NewEsInit extends Command
                 ],
                 "dest"   => [
                     "index" => $this->newIndex
+                ],
+                "script" => [
+                    // 修改字段名称
+//                    "source" => "ctx._source.label_name = ctx._source.remove(\"label\")"
+                    // 修改字段内容
+                    "source" => "if(ctx._source.view < 1000) {ctx._source.view++; ctx._source.views = ctx._source.view}"
                 ]
             ]
         ];
@@ -162,6 +177,4 @@ class NewEsInit extends Command
     {
         $index = ["index" => $index ?? $this->newIndex];
 
-        ElasticsearchClient::indices()->delete($index);
-    }
-}
+        ElasticsearchClient::ind

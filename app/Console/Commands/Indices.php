@@ -35,6 +35,8 @@ class Indices
                 ],
                 "label"   => [
                     "type" => "keyword",
+                    // index，可用于设置字段是否被索引，默认为true，false即为不可搜索。
+                    "index" => false
                 ],
                 "created_at" => [
                     "type" => "date",

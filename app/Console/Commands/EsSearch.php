@@ -146,5 +146,55 @@ class EsSearch extends Command
 
         dd(ElasticsearchClient::existsSource($params));
     }
+    
+    /**
+     * Notes: 批量搜索修改文档内容
+     * Date: 2020/12/1 11:50
+     */
+    protected function updateByQuery()
+    {
+        $params = SearchBuilder::setIndex("demo_index_20201129")
+            ->setBody([
+                "query" => [
+                    "match_all" => new \stdClass()
+                ],
+                "script" => [
+                    /**
+                     * 修改文档内容
+                     */
+                    // a
+//                    "source" => "ctx._source.views++", // 将文档中 views 的值改为0
+//                    "source" => "ctx._source['area']='无'", // 中文
+
+                    // b
+//                    "source" => "ctx._source.views += params.num",
+//                    "params" => [
+//                        "num" => 1,
+//                    ],
+
+                    /**
+                     * 给文档添加字段和内容
+                     */
+                    // a、直接添加
+//                    "lang" => "painless",
+//                    "inline" => "ctx._source.create_time = '20201201'", // 新增字段 create_time
+                    // b、给数组添加
+//                    "source" => "ctx._source.tags.add(params.tag)",
+//                    "params" => [
+//                        "tag" => "test"
+//                    ]
+
+                    /**
+                     * 移除字段
+                     */
+//                    "source" => "ctx._source.remove('views')"
+
+                ]
+            ])
+            ->ignore(400)
+            ->builder();
+
+        dd(ElasticsearchClient::updateByQuery($params));
+    }
 
 }

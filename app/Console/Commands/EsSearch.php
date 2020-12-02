@@ -196,5 +196,26 @@ class EsSearch extends Command
 
         dd(ElasticsearchClient::updateByQuery($params));
     }
+    
+    /**
+     * Notes: 批量删除
+     * Date: 2020/12/2 13:40
+     */
+    protected function deleteByQuery()
+    {
+        $params = SearchBuilder::connection("elastic")
+            ->setParams([
+                "bool" => [
+                    "filter" => [
+                        "term" => [
+                            "view" => 1
+                        ]
+                    ]
+                ]
+            ])
+            ->builder();
+
+        dd(ElasticsearchClient::connection("elastic")->deleteByQuery($params));
+    }
 
 }

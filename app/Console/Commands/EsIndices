@@ -58,4 +58,20 @@ class EsIndices extends Command
         dd(ElasticsearchClient::indices()->updateAliases($params));
     }
    
+   /**
+     * Notes: 获取某个字段的映射类型
+     * Date: 2020/12/2 11:54
+     */
+    protected function getFieldMapping()
+    {
+        $params = [
+            "index" => "demo_index_1000",
+            // 单个字段
+            "fields" => "view",
+            // 多个字段
+//            "fields" => ["view", "label"]
+        ];
+
+        dd(ElasticsearchClient::connection("elastic")->indices()->getFieldMapping($params));
+    }
 }

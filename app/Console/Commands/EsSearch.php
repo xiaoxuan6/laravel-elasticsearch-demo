@@ -44,32 +44,129 @@ class EsSearch extends Command
 
     protected function search()
     {
-        $params = SearchBuilder::setIndex("demo_index_20201129")->setParams([
-/*            "bool" => [
+        $params = SearchBuilder::connection("elastic")->setParams([
+            /*"bool" => [
                 "must" => [
-//                    "match" => [
+                    "match" => [
+                        "name" => "模型 dingo"
+                        // 短语搜索 不进行分词
 //                        "name" => [
 //                            "query" => "模型 dingo",
 //                            "operator" => "and" // 这个会当成短语搜索，不进行分词和 match_phrase 结果相同
 //                        ]
-//                    ]
+                    ]
                     // 短语搜索
 //                    "match_phrase" => [
 //                        "name" => "模型 dingo"
 //                    ]
                     // 多字段
-                    "multi_match" => [
-                        "query"  => "laravel",
-                        "fields" => ["name", "label"]
-                    ]
+//                    "multi_match" => [
+//                        "query"  => "laravel",
+//                        "fields" => ["name", "label"]
+//                    ]
+
+//                    "match" => [
+//                        "label" => "laravel" // 搜索報錯，因为添加映射的时候设置为不可搜索
+//                    ]
                 ]
             ]*/
             "match_all" => (object)[]
         ])
+            ->setAggregations([
+                /**
+                 * 聚合类型：
+                 *      最大 max、最小 min、平均 avg、总和 sum
+                 *      扩展数据 extended_stats (包含最大、最小、平均、总和、总文档数等)
+                 *      统计 stats (值包含总和、最大、最小、平均、总文档数)
+                 *      文档总数 value_count
+                 *      过滤器聚合
+                 */
+                // 平均聚合
+//                "avg_view" => [
+                    // 普通
+//                    "avg" => [
+//                        "field" => "view",
+//                        // missing 参数定义应如何处理缺少值的文档。默认情况下，它们将被忽略，但也可以将它们视为具有值。
+//                        "missing" => 0,
+//                    ],
+                    // 使用脚本
+//                    "avg" => [
+//                        "script" => [
+//                            // 这里使用文档中的数据
+//                              "lang" => "painless",
+//                              "source" => "doc['view'].value",
+                              // 值脚本
+//                              "lang" => "painless",
+//                              "source" => "doc['view'].value * params.num",
+//                              "params" => [
+//                                  "num" => 2
+//                              ]
+//                        ]
+//                    ]
+//                ],
+
+                // 扩展数据聚合(包含最大、最小、平均等)
+//                "view_stats" => [
+//                    "extended_stats" => [
+//                        "field" => "view"
+//                    ]
+//                ]
+
+                // 过滤器聚合
+                "view_stats" => [
+                    // 搜索 name 中包含 ajax 的，然后通过聚合求平均值（这可以省略上面的 setParams 方法）
+                    // 如何使用下面 aggs 方法，结果中只有筛选中的一个文档，这个默认去不文档，聚合只有符合条件的才计算
+                    "filter" => [
+                        "match" => [
+                            "name" => "ajax"
+                        ]
+                    ],
+                    "aggs"   => [
+                        "avg_view" => [
+                            "avg" => [
+                                "field" => "view"
+                            ]
+                        ]
+                    ]
+                ]
+
+            ])
+//            ->setSource("view")
+            ->ignore([400, 404])
             ->paginate(1, 100)// 分页
             ->builder();
 
-        dd(ElasticsearchClient::search($params));
+        $result = ElasticsearchClient::search($params);
+
+        dd($result);
+    }
+
+    /**
+     * Notes: 过滤器聚合
+     * Date: 2020/12/2 11:17
+     */
+    protected function aggs()
+    {
+        $params = SearchBuilder::connection("elastic")
+            ->setParams([
+                "bool" => [
+                    "filter" => [
+                        "match" => [
+                            "name" => "ajax"
+                        ]
+                    ]
+                ]
+            ])
+            ->setAggregations([
+                "view_stats" => [
+                    "avg" => [
+                        "field" => "view"
+                    ]
+                ]
+            ])
+            ->builder();
+
+        dd(ElasticsearchClient::connection("elastic")->search($params));
     }
 
     /**
@@ -78,7 +175,7 @@ class EsSearch extends Command
      */
     protected function createIndex()
     {
-        $params = SearchBuilder::setIndex("demo_index_20201129")->setKey(1000)->builder();
+        $params = SearchBuilder::connection("elastic")->setKey(1000)->builder();
         dd(ElasticsearchClient::index($params));
     }
 
@@ -92,7 +189,7 @@ class EsSearch extends Command
          * ignore()：状态码，默认404
          *      搜索文档如果没有该文档将报错信息已数组的形式输出
          */
-        $params = SearchBuilder::setIndex("demo_index_20201129")->setKey(1000)/*->ignore()*/->unsetBody()->builder();
+        $params = SearchBuilder::connection("elastic")->setKey(1000)/*->ignore()*/->unsetBody()->builder();
 
         dd(ElasticsearchClient::get($params));
     }
@@ -103,7 +200,7 @@ class EsSearch extends Command
      */
     protected function updateIndex()
     {
-        $params = SearchBuilder::setIndex("demo_index_20201129")
+        $params = SearchBuilder::connection("elastic")
             ->setKey(23)
             ->setBody([
                 "script" => [
@@ -131,7 +228,7 @@ class EsSearch extends Command
      */
     protected function deleteIndex()
     {
-        $params = SearchBuilder::setIndex("demo_index_20201129")->setKey(1000)->unsetBody()->builder();
+        $params = SearchBuilder::connection("elastic")->setKey(1000)->unsetBody()->builder();
 
         dd(ElasticsearchClient::delete($params));
     }
@@ -142,18 +239,18 @@ class EsSearch extends Command
      */
     protected function existsSource()
     {
-        $params = SearchBuilder::setIndex("demo_index_20201129")->setKey(1000)->unsetBody()->builder();
+        $params = SearchBuilder::connection("elastic")->setKey(1000)->unsetBody()->builder();
 
         dd(ElasticsearchClient::existsSource($params));
     }
-    
+
     /**
      * Notes: 批量搜索修改文档内容
      * Date: 2020/12/1 11:50
      */
     protected function updateByQuery()
     {
-        $params = SearchBuilder::setIndex("demo_index_20201129")
+        $params = SearchBuilder::connection("elastic")
             ->setBody([
                 "query" => [
                     "match_all" => new \stdClass()
@@ -196,7 +293,7 @@ class EsSearch extends Command
 
         dd(ElasticsearchClient::updateByQuery($params));
     }
-    
+
     /**
      * Notes: 批量删除
      * Date: 2020/12/2 13:40
@@ -217,5 +314,4 @@ class EsSearch extends Command
 
         dd(ElasticsearchClient::connection("elastic")->deleteByQuery($params));
     }
-
 }

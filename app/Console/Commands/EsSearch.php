@@ -245,6 +245,17 @@ class EsSearch extends Command
     }
 
     /**
+     * Notes: 获取某个文章中的 source
+     * Date: 2020/12/2 17:20
+     */
+    protected function getSource()
+    {
+        $params = SearchBuilder::connection("elastic")->setKey(2)->unsetBody()->builder();
+
+        dd(ElasticsearchClient::getSource($params));
+    }
+    
+    /**
      * Notes: 批量搜索修改文档内容
      * Date: 2020/12/1 11:50
      */

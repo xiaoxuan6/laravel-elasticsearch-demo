@@ -133,6 +133,19 @@ class EsSearch extends Command
             ])
 //            ->setSource("view")
             ->ignore([400, 404])
+            ->orderBy([
+                "_script" => [
+                    "type" => "number",
+                    "script" => [
+                        "lang" => "painless",
+                        "source" => "doc['view'].value * 10",
+                        "params" => [
+                            "num" => 10
+                        ],
+                    ],
+                    "order" => "desc"
+                ]
+            ])
             ->paginate(1, 100)// 分页
             ->builder();
 

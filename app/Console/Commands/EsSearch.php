@@ -216,6 +216,14 @@ class EsSearch extends Command
         $params = SearchBuilder::connection("elastic")
             ->setKey(23)
             ->setBody([
+                // A、正常更新
+                "doc" => [
+                    "integral" => 1
+                ],
+                // 如果doc中定义的部分与现在的文档相同，则默认不会执行任何动作。设置detect_noop=false，就会无视是否修改，强制合并到现有的文档
+                "detect_noop" => false,
+                
+                // B、使用脚本
                 "script" => [
                     // 将view 中的值增加1
                     "source" => "ctx._source.view += params.time",

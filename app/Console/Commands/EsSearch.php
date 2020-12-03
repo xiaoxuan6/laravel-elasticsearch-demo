@@ -65,6 +65,13 @@ class EsSearch extends Command
 //                        "fields" => ["name", "label"]
 //                    ]
 
+                    // 匹配短语检索 设置偏离值 slop
+                    "multi_match" => [
+                        "query"  => "意中人 英雄",
+                        "fields" => ["username", "label"], // 这里切记，应为创建索引的时候映射中不包含 label 和 name 所以查找结果为空，这里换成username
+                        "slop" => 15
+                    ]
+
 //                    "match" => [
 //                        "label" => "laravel" // 搜索報錯，因为添加映射的时候设置为不可搜索
 //                    ]

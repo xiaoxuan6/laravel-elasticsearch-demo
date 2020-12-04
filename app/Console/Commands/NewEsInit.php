@@ -113,12 +113,16 @@ class NewEsInit extends Command
     /**
      * Notes: 迁移数据
      * Date: 2020/11/29 17:10
+     *
+     * 更多使用方法：
+     * @see https://blog.csdn.net/ctwy291314/article/details/82734667
      */
     public function reindex()
     {
         $params = [
             "body" => [
-                "max_docs" => "20", // 最大同步文档数据
+//                "max_docs" => "20", // 最大同步文档数据
+//                "size" => 10000,   // 值reindex按照sort排序后的size条数据
                 "source" => [
                     "index"   => $this->index,
                     // 搜索条件、对满足query条件的数据进行reindex操作
@@ -130,20 +134,25 @@ class NewEsInit extends Command
 //                    ],
                     // 数据迁移，保留的字段
 //                    "_source" => ["id", "name", "content"]
-
-                    /**
-                     * 更多使用方法：
-                     * @see https://blog.csdn.net/ctwy291314/article/details/82734667
-                     */
                 ],
                 "dest"   => [
-                    "index" => $this->newIndex
+                    "index" => $this->newIndex,
+                    //  version_type属性默认值为internal，即当发生冲突后会覆盖之前的document，而当设置为external则会新生成一个另外的document，
+//                    "version_type" => "external",
+                    // 将op_type设置为create时，只会对发生不同的document进行reindex
+//                    "op_type" => "create"
                 ],
                 "script" => [
                     // 修改字段名称
 //                    "source" => "ctx._source.label_name = ctx._source.remove(\"label\")"
                     // 修改字段内容
-                    "source" => "if(ctx._source.view < 1000) {ctx._source.view++; ctx._source.views = ctx._source.view}"
+//                    "source" => "if(ctx._source.view < 1000) {ctx._source.view++; ctx._source.views = ctx._source.view}"
+
+                    "lang" => "painless",
+                    "source" => "ctx._source.view = params.num",
+                    "params" => [
+                        "num" => 10
+                    ]
                 ]
             ]
         ];

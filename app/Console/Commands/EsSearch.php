@@ -65,6 +65,13 @@ class EsSearch extends Command
 //                        "fields" => ["name", "label"]
 //                    ]
 
+                    // 匹配短语检索 设置偏离值 slop
+                    "multi_match" => [
+                        "query"  => "意中人 英雄",
+                        "fields" => ["username", "label"], // 这里切记，应为创建索引的时候映射中不包含 label 和 name 所以查找结果为空，这里换成username
+                        "slop" => 15
+                    ]
+
 //                    "match" => [
 //                        "label" => "laravel" // 搜索報錯，因为添加映射的时候设置为不可搜索
 //                    ]
@@ -133,6 +140,19 @@ class EsSearch extends Command
             ])
 //            ->setSource("view")
             ->ignore([400, 404])
+            ->orderBy([
+                "_script" => [
+                    "type" => "number",
+                    "script" => [
+                        "lang" => "painless",
+                        "source" => "doc['view'].value * 10",
+                        "params" => [
+                            "num" => 10
+                        ],
+                    ],
+                    "order" => "desc"
+                ]
+            ])
             ->paginate(1, 100)// 分页
             ->builder();
 
@@ -203,6 +223,14 @@ class EsSearch extends Command
         $params = SearchBuilder::connection("elastic")
             ->setKey(23)
             ->setBody([
+                // A、正常更新
+                "doc" => [
+                    "integral" => 1
+                ],
+                // 如果doc中定义的部分与现在的文档相同，则默认不会执行任何动作。设置detect_noop=false，就会无视是否修改，强制合并到现有的文档
+                "detect_noop" => false,
+                
+                // B、使用脚本
                 "script" => [
                     // 将view 中的值增加1
                     "source" => "ctx._source.view += params.time",

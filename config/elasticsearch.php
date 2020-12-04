@@ -42,6 +42,42 @@ return [
 
             "type" => env("ELASTICSEARCH_TYPE", "elasticsearch_type"),
         ],
+
+        'oauth' => [
+            'hosts' => [
+                [
+                    'host'   => env('ELASTICSEARCH_HOST', 'localhost'),
+                    'port'   => env('ELASTICSEARCH_PORT', 9200),
+                    'scheme' => env('ELASTICSEARCH_SCHEME', null),
+                    'user'   => env('ELASTICSEARCH_USER', null),
+                    'pass'   => env('ELASTICSEARCH_PASS', null),
+                ],
+            ],
+
+            'logging' => false,
+
+            "index" => env("ELASTICSEARCH_OAUTH_INDEX", "elasticsearch_index"),
+
+            "type" => env("ELASTICSEARCH_OAUTH_TYPE", "elasticsearch_type"),
+        ],
+
+        'relation' => [
+            'hosts' => [
+                [
+                    'host'   => env('ELASTICSEARCH_HOST', 'localhost'),
+                    'port'   => env('ELASTICSEARCH_PORT', 9200),
+                    'scheme' => env('ELASTICSEARCH_SCHEME', null),
+                    'user'   => env('ELASTICSEARCH_USER', null),
+                    'pass'   => env('ELASTICSEARCH_PASS', null),
+                ],
+            ],
+
+            'logging' => false,
+
+            "index" => env("ELASTICSEARCH_RELATION_INDEX", "elasticsearch_index"),
+
+            "type" => env("ELASTICSEARCH_RELATION_TYPE", "elasticsearch_type"),
+        ],
     ],
 
     /**

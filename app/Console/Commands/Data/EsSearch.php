@@ -43,7 +43,7 @@ class EsSearch extends Command
     }
 
     /**
-     * Notes: 过滤桶
+     * Notes: 过滤桶（查询所有文档，过滤积分大于 100，然后求平均值）
      * Date: 2020/12/7 16:48
      */
     public function filter()
@@ -69,6 +69,44 @@ class EsSearch extends Command
                         ]
                     ]
                 ],
+            ])
+            ->builder();
+
+        dd(ElasticsearchClient::connection("oauth")->search($params));
+    }
+
+    /**
+     * Notes: 后过滤器
+     *      这一步发生在执行查询之后，因此聚合是不会被影响的，只会改变查询结果中的 hits
+     *
+     * Date: 2020/12/7 16:58
+     */
+    public function postFilter()
+    {
+        $params = SearchBuilder::connection("oauth")
+            ->setParams([
+                "match_all" => new \stdClass()
+            ])
+            // 通过聚合得到所有的 积分
+            ->setAggregations([
+                "integral_all" => [
+                    "terms" => [
+                        "field" => "integral"
+                    ]
+                ]
+            ])
+            // 然后对搜索结果进行处理
+            ->setAttribute([
+                "body.post_filter" => [
+//                    "term" => [
+//                        "integral" => 110
+//                    ]
+                    "range" => [
+                        "integral" => [
+                            "gte" => 100
+                        ]
+                    ]
+                ]
             ])
             ->builder();
 

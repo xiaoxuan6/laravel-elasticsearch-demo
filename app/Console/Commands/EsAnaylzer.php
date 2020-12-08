@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Model\Book;
 use Illuminate\Console\Command;
 use Vinhson\Elasticsearch\Facades\ElasticsearchClient;
 use Vinhson\Elasticsearch\Facades\SearchBuilder;
@@ -102,6 +103,31 @@ class EsAnaylzer extends Command
             ->builder();
 
         dd(ElasticsearchClient::connection("book")->indices()->create($params));
+    }
+
+    /**
+     * Notes: 插入数据
+     * Date: 2020/12/8 15:44
+     */
+    public function insert()
+    {
+        Book::query()
+            ->chunkById(10, function($books){
+
+                $params = ["body" => []];
+                foreach ($books as $book) {
+                    $params["body"][] = [
+                        "index" => [
+                            "_index" => "book",
+                            "_id" => $book->getKey()
+                        ]
+                    ];
+
+                    $params["body"][] = $book->toArray();
+                }
+
+                ElasticsearchClient::connection("book")->bulk($params);
+            });
     }
 
 }

@@ -79,10 +79,15 @@ class EsAnaylzer extends Command
                         // 同义词 synonyms
                         "synonym_filter" => [
                             "type" => "synonym",
-                            "synonyms" => [
-                                "扩展包,packagist",
-                                "主从复制,copy,database_copy"
-                            ]
+                            // 方法一、
+//                            "synonyms" => [
+//                                "扩展包,packagist",
+//                                "主从复制,copy,database_copy"
+//                            ]
+                            // 方法二、为了防止这里定义过多的数据，我们可以把所有的同义词放到一个文档中。
+                            // 官网 https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-synonym-graph-tokenfilter.html
+                            // 首先，我们在 Elasticsearch 的 config 目录中，创建一个叫做 analysis 的子目录，然后创建一个叫做 synonyms.txt 的文档
+                            "synonyms_path" => "analysis/synonyms.txt"
                         ]
                     ],
                     // 分析器
@@ -107,7 +112,17 @@ class EsAnaylzer extends Command
                     "title" => [
                         "type" => "text",
                         "analyzer" => "new_analyzer", // 创建索引时使用中文分词器
-                        "search_analyzer" => "new_analyzer", // 使用上面自定义的分析器
+//                        "search_analyzer" => "new_analyzer", // 使用上面自定义的分析器
+                        /**
+                         * 注意：如何 analyzer 创建索引的时候使用自定义分析器，就不需要定义 search_analyzer，否则必须定义，不然搜索时用不上自定义的分析器
+                         *
+                         * ex：1
+                         *      "analyzer" => "new_analyzer"
+                         *
+                         * ex：2
+                         *      "analyzer" => "ik_max_word" // 分文分析器
+                         *      "search_analyzer" => "new_analyzer" // 这里必须定义
+                         */
                     ]
                 ]
             ])

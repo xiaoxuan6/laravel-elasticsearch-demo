@@ -78,6 +78,24 @@ return [
 
             "type" => env("ELASTICSEARCH_RELATION_TYPE", "elasticsearch_type"),
         ],
+        
+        'book' => [
+            'hosts' => [
+                [
+                    'host'   => env('ELASTICSEARCH_HOST', 'localhost'),
+                    'port'   => env('ELASTICSEARCH_PORT', 9200),
+                    'scheme' => env('ELASTICSEARCH_SCHEME', null),
+                    'user'   => env('ELASTICSEARCH_USER', null),
+                    'pass'   => env('ELASTICSEARCH_PASS', null),
+                ],
+            ],
+
+            'logging' => false,
+
+            "index" => env("ELASTICSEARCH_BOOK_INDEX", "elasticsearch_index"),
+
+            "type" => env("ELASTICSEARCH_BOOK_TYPE", "elasticsearch_type"),
+        ],
     ],
 
     /**

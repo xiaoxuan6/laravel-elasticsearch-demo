@@ -142,18 +142,18 @@ class NewEsInit extends Command
                     // 将op_type设置为create时，只会对发生不同的document进行reindex
 //                    "op_type" => "create"
                 ],
-                "script" => [
-                    // 修改字段名称
-//                    "source" => "ctx._source.label_name = ctx._source.remove(\"label\")"
-                    // 修改字段内容
-//                    "source" => "if(ctx._source.view < 1000) {ctx._source.view++; ctx._source.views = ctx._source.view}"
-
-                    "lang" => "painless",
-                    "source" => "ctx._source.view = params.num",
-                    "params" => [
-                        "num" => 10
-                    ]
-                ]
+//                "script" => [
+//                    // 修改字段名称
+////                    "source" => "ctx._source.label_name = ctx._source.remove(\"label\")"
+//                    // 修改字段内容
+////                    "source" => "if(ctx._source.view < 1000) {ctx._source.view++; ctx._source.views = ctx._source.view}"
+//
+//                    "lang" => "painless",
+//                    "source" => "ctx._source.view = params.num",
+//                    "params" => [
+//                        "num" => 10
+//                    ]
+//                ]
             ]
         ];
 
@@ -184,9 +184,13 @@ class NewEsInit extends Command
      */
     public function delete($index = null)
     {
-        $index = ["index" => $index ?? $this->newIndex];
+        if ($index) {
+            $indexInfo = ElasticsearchClient::indices()->getAlias(['index' => $index]);
+            $index = current(array_keys($indexInfo));
+        }
 
-        
+        $index = ["index" => $index ? $index : $this->newIndex];
+
         ElasticsearchClient::indices()->delete($index);
     }
 }

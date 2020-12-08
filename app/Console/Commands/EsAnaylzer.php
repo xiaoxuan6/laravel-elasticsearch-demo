@@ -129,5 +129,26 @@ class EsAnaylzer extends Command
                 ElasticsearchClient::connection("book")->bulk($params);
             });
     }
+    
+    /**
+     * Notes: 测试自定义分析器
+     * Date: 2020/12/8 17:07
+     */
+    public function select()
+    {
+        $params = SearchBuilder::connection("book")
+            ->setParams([
+                "bool" => [
+                    "filter" => [
+                        "match" => [
+                            "title" => "elasticsearch 超详细packagist copy"
+                        ]
+                    ]
+                ]
+            ])
+            ->builder();
+
+        dd(ElasticsearchClient::connection("book")->search($params));
+    }
 
 }

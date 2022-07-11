@@ -10,7 +10,7 @@
     "require": {
         "php": "^7.2",
         "fideloper/proxy": "^4.0",
-		"james.xue/laravel-elasticsearch": "2.1.*",
+		"james.xue/laravel-elasticsearch": "2.2.*",
         "laravel/framework": "^6.18.35",
         "laravel/tinker": "^2.0"
     },

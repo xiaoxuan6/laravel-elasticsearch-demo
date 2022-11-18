@@ -9,3 +9,9 @@ docker-compose up -d
 ```bash
 docker-compose run --rm artisan migrate 
 ```
+
+# elasticsearch 创建索引
+
+```bash
+docker-compose run --rm artisan es:init
+```

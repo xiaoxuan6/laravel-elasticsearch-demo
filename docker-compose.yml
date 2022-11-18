@@ -3,11 +3,7 @@ version: '3.6'
 services:
   elasticsearch:
     container_name: elasticsearch
-    build:
-      context: ./elasticsearch
-      args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
-        ELASTICSEARCH_PLUGINS: ${ELASTICSEARCH_PLUGINS}
+    image: xiaoxuan6/elasticsearch
     restart: on-failure
     ports:
       - ${ELASTICSEARCH_PORT}:9200

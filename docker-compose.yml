@@ -3,7 +3,7 @@ version: '3.6'
 services:
   elasticsearch:
     container_name: elasticsearch
-    image: xiaoxuan6/elasticsearch
+    image: xiaoxuan6/elasticsearch:7.17.6
     restart: on-failure
     ports:
       - ${ELASTICSEARCH_PORT}:9200
@@ -19,8 +19,7 @@ services:
 
   php:
     container_name: php
-    build:
-      context: ./
+    image: xiaoxuan6/php:7.4-fpm-alpine
     restart: on-failure
     ports:
       - 9000:9000
@@ -61,8 +60,7 @@ services:
 
   artisan:
     container_name: artisan
-    build:
-      context: ./
+    image: xiaoxuan6/php:7.4-fpm-alpine
     volumes:
       - ./:/var/www/html
     depends_on:

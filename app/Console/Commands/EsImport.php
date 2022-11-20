@@ -40,11 +40,14 @@ class EsImport extends Command
      */
     public function handle()
     {
+        $this->info(sprintf('Article 总共 %s 条数据', Article::query()->count()));
+
         Article::query()
             ->chunkById(10, function ($articles) {
 
                 $this->info(sprintf("正在同步 ID 范围为 %s 至 %s 的数据", $articles->first()->id, $articles->last()->id));
 
+                /** @var $article Article */
                 $params = ["body" => []];
                 foreach ($articles as $article) {
 
@@ -59,9 +62,9 @@ class EsImport extends Command
                     $params["body"][] = Arr::only($data, ["id", "name", "content", "view", "label", "created_at"]);
                 }
 
-                try{
+                try {
                     ElasticsearchClient::bulk($params);
-                }catch (\Exception $exception) {
+                } catch (\Exception $exception) {
                     $this->error("批量添加失败");
                 }
             });

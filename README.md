@@ -15,3 +15,11 @@ docker-compose run --rm artisan migrate
 ```bash
 docker-compose run --rm artisan es:init
 ```
+
+# 创建表 `articles` 并填充数据导入 `es`
+
+```bash
+docker-compose run --rm artisan migrate
+docker-compose run --rm artisan db:seed --class=ArticleSeeder
+docker-compose run --rm artisan es:import elasticsearch_index_1000
+```

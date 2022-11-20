@@ -6,18 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
 {
-    protected $casts = [
-        'label_id' => 'array',
-    ];
-
-    public function toESArray()
+    public function toESArray(): array
     {
-        $arrtibute = $this->toArray();
-
-        $arrtibute["label"] = Label::whereIn("id", $this->label_id)->pluck("title")->implode("，");
-
-        $arrtibute["content"] = str_replace(["\r\n", "&nbsp", ";"], "", strip_tags($arrtibute["content"]));
-
-        return $arrtibute;
+        return $this->toArray();
     }
 }

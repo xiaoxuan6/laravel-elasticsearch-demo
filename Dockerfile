@@ -25,6 +25,7 @@ COPY . ${LARAVEL_PATH}
 COPY --from=build /app/vendor/ ${LARAVEL_PATH}/vendor/
 
 RUN cd ${LARAVEL_PATH} \
+    && docker-php-ext-install mysqli pdo pdo_mysql \
     && chmod -R 777 storage \
     && php artisan package:discover
 

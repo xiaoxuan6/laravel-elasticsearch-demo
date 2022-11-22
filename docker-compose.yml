@@ -51,7 +51,9 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./:/var/www/html
+#      - ./:/var/www/html # 这里有个坑，dockerfile 中执行了 composer install 与挂载目录不能同时存在，否则 composer install 无法生成 vendor 目录，以挂载目录为准
+      - ./default.conf:/etc/apache2/sites-available/000-default.conf
+#      - ./entrypoint.sh:/usr/local/bin/entrypoint
     depends_on:
       - mysql
       - elasticsearch

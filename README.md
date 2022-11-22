@@ -4,22 +4,42 @@
 docker-compose up -d
 ```
 
-# 执行数据迁移
+# 常见错误
+
+## 1、apt-get update 时报错：`Err http://deb.debian.org jessie Release.gpg Could not resolve 'deb.debian.org'`
+
+## 2、Docker中使用 git clone 报错 Could not resolve host: github.com；
+
+### 解决方法一：(不推荐，每次重启机器 resolv.conf 会自动恢复)
+
+1、在docker所在环境中执行：修改 `resolv.conf`
 
 ```bash
-docker-compose run --rm artisan migrate 
+vim /etc/resolv.conf
+
+nameserver 8.8.8.8
 ```
 
-# elasticsearch 创建索引
+2、重启docker
 
 ```bash
-docker-compose run --rm artisan es:init
+service docker restart
 ```
 
-# 创建表 `articles` 并填充数据导入 `es`
+### 解决方法二、(推荐)
+
+1、找出宿主机的 `dns`：
 
 ```bash
-docker-compose run --rm artisan migrate
-docker-compose run --rm artisan db:seed --class=ArticleSeeder
-docker-compose run --rm artisan es:import elasticsearch_index_1000
+cat /etc/resolv.conf
 ```
+
+2、编辑 `/etc/docker/daemon.json` 文件
+
+```bash
+{                                                                          
+    "dns": ["x.x.x.x"]                                                                           
+} 
+```
+
+重启docker服务： `systemctl restart docker`

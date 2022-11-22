@@ -2,4 +2,14 @@
 .github/
 .idea/
 /vendor
-/node_modules
+bootstrap/cache/*
+node_modules/
+storage/app/*
+storage/framework/cache/*
+storage/framework/testing/*
+storage/logs/*
+phpunit.xml
+README.md
+.editorconfig
+.env.example
+.gitattributes

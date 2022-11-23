@@ -25,11 +25,14 @@ COPY . ${LARAVEL_PATH}
 COPY --from=build /app/vendor/ ${LARAVEL_PATH}/vendor/
 
 RUN cd ${LARAVEL_PATH} \
-    && docker-php-ext-install mysqli pdo pdo_mysql \
+    && docker-php-ext-install mysqli pdo_mysql \
     && chmod -R 777 storage \
     && php artisan package:discover
 
 COPY default.conf /etc/apache2/sites-available/000-default.conf
+
+# Enable apache modules
+RUN a2enmod rewrite
 
 EXPOSE 80
 COPY entrypoint.sh /usr/local/bin/entrypoint

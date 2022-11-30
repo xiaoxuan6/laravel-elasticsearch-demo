@@ -14,6 +14,13 @@ services:
     volumes:
       - ./elasticsearch/data:/usr/share/elasticsearch/data
       - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    # HEALTHCHECK 只可以出现一次，如果写了多个，只有最后一个生效。
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://127.0.0.1:9200"]
+      interval: 3m # 两次健康检查的间隔，默认为 30 秒，单位(h/m/s)；
+      timeout: 3m # 健康检查命令运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒，单位(h/m/s)；
+      # retries: 3 # 当连续失败指定次数后，则将容器状态视为 unhealthy，默认 3 次。
+      # start_period: 40s # 该start_period选项是在文件格式 3.4 中添加的
     networks:
       elasticsearch:
 

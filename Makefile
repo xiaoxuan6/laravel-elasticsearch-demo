@@ -9,6 +9,12 @@ ps:
 run:
 	@docker-compose up -d
 
+down:
+	@docker-compose down
+
+retry: down run
+	@# 重新执行容器
+
 .PHONY: artisan
 artisan:
 	@docker-compose run --rm artisan ${command}

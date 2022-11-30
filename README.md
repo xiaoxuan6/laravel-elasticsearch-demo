@@ -1,4 +1,4 @@
-# 启动
+# 方法一、启动
 
 ```bash
 docker-compose up -d
@@ -23,3 +23,7 @@ docker-compose run --rm artisan migrate
 docker-compose run --rm artisan db:seed --class=ArticleSeeder
 docker-compose run --rm artisan es:import elasticsearch_index_1000
 ```
+
+# 方法二、将数据迁移和 es 初始化集成到容器中执行
+
+[Dockerfile](https://github.com/xiaoxuan6/laravel-elasticsearch-demo/tree/dockerfile)

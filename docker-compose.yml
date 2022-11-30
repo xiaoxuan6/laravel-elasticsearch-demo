@@ -17,8 +17,8 @@ services:
     # HEALTHCHECK 只可以出现一次，如果写了多个，只有最后一个生效。
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://127.0.0.1:9200"]
-      interval: 3m # 两次健康检查的间隔，默认为 30 秒，单位(h/m/s)；
-      timeout: 3m # 健康检查命令运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒，单位(h/m/s)；
+      # interval: 3m # 两次健康检查的间隔，默认为 30 秒，单位(h/m/s)；
+      # timeout: 30s # 健康检查命令运行超时时间，如果超过这个时间，本次健康检查就被视为失败，默认 30 秒，单位(h/m/s)；
       # retries: 3 # 当连续失败指定次数后，则将容器状态视为 unhealthy，默认 3 次。
       # start_period: 40s # 该start_period选项是在文件格式 3.4 中添加的
     networks:
@@ -59,6 +59,11 @@ services:
       MYSQL_PASSWORD: "root"
       MYSQL_ROOT_USER: "root"
       MYSQL_ROOT_PASSWORD: "root"
+    healthcheck:
+      # mysql -u 用户名 -p密码 -h 服务器IP地址 -P 服务器端MySQL端口号 -D 数据库名
+      #test: [ "CMD", "mysql", "-h", "127.0.0.1", "-P", "3306", "-u", "root", "-p", "root", "-e", "SELECT 1", "cache" ]
+      test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
+      retries: 5
     networks:
       elasticsearch:
 
@@ -72,6 +77,14 @@ services:
       - php
       - elasticsearch
       - mysql
+      # condition在版本 3.0 到 3.8 中删除了 compose 规范，但现在又回来了！
+      # 目前无法使用，未知错误。使用 version 3.9 同样报错
+#      php:
+#        condition: service_started
+#      elasticsearch:
+#        condition: service_healthy
+#      mysql:
+#        condition: service_healthy
     volumes:
       - ./:/var/www/html
       - ./default.conf:/etc/nginx/conf.d/default.conf

@@ -1,3 +1,11 @@
+# condition在版本 3.0 到 3.8 中删除了 compose 规范，但现在又回来了！
+# 注意 version 和 docker-compose 版本
+
+# docker-compose version 1.25.1, build a82fef07 报错：
+# ERROR: Version in "./docker-compose.yml" is unsupported. You might be seeing this error because you're using the wrong Compose file version. Either specify a supported version (e.g "2.2" or "3.3") and place your service definitions under the `services` key, or omit the `version` key and place your service definitions at the root of the file to use version 1.
+#  For more on the Compose file format versions, see https://docs.docker.com/compose/compose-file/
+
+# 更新 docker-compose version v2.14.0 解决上面报错
 version: '3.8'
 
 services:
@@ -78,8 +86,6 @@ services:
       - php
       - elasticsearch
       - mysql
-      # condition在版本 3.0 到 3.8 中删除了 compose 规范，但现在又回来了！
-      # 目前无法使用，未知错误。使用 version 3.9 同样报错
 #      php:
 #        condition: service_started
 #      elasticsearch:
